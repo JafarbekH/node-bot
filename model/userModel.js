@@ -11,6 +11,10 @@ const userModel = new mongoose.Schema({
         type: String,
         default: null
     },
+    userOlmos: {
+        type: Number,
+        default: 2
+    },
     userPrice: {
         type: Number,
         default: 0
@@ -22,6 +26,10 @@ const userModel = new mongoose.Schema({
     isActiveUser: {
         type: Boolean,
         default: true
+    },
+    son: {
+        type: Number,
+        default: 0
     }
 })
 

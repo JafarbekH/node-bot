@@ -1,10 +1,14 @@
 const { bot } = require("./bot");
-const { startKeyboard } = require("./keyboard/keyboard");
+const { startKeyboard, oylanganSon } = require("./keyboard/keyboard");
 const { checkSubscriptions } = require("./testcheckUser");
 const Channels = require('../model/channelModel')
 const User = require('../model/userModel');
 
 
+
+bot.setMyCommands([
+    { command: '/start', description: 'Botni ishga tushirish🚀' }
+])
 
 
 
@@ -34,15 +38,15 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
             user.isActiveUser = false
             await User.findByIdAndUpdate(user._id, user, {new: true})
 
-            let addUserPrice = await User.findOne({userId: user.userFrom}).lean()
-            addUserPrice.userPrice += 1
-            await User.findByIdAndUpdate(addUserPrice._id, addUserPrice, {new: true})
+            let addUserOlmos = await User.findOne({userId: user.userFrom}).lean()
+            addUserOlmos.userOlmos += 1
+            await User.findByIdAndUpdate(addUserOlmos._id, addUserOlmos, {new: true})
 
-            bot.sendMessage(userId, `Assalomu alaykum <b><a href="tg://user?id=${msg.from.id}">${msg.from.first_name}</a></b>\n\nPul ishlash uchun pastdagi tugma orqali havolangizni oling va do'stlaringizni taklif qiling! Har bir do'stingiz uchun 500 so'm miqdoridagi pul balansingizga qo'shiladi.\n\n<b>📝Shartlar</b> tugmachasini tanlash orqali to'liq tanishib chiqishingiz mumkin!`, {parse_mode: 'HTML', reply_markup: startKeyboard})
+            bot.sendMessage(userId, `Assalomu alaykum <b><a href="tg://user?id=${msg.from.id}">${msg.from.first_name}</a></b>\n\nBot o'ylagan sonni topgan har bir to'g'ri javobingiz uchun 500 so'm miqdoridagi pul balansingizga qo'shiladi.\n\n<b>📝Shartlar</b> tugmachasini tanlash orqali to'liq tanishib chiqishingiz mumkin!`, {parse_mode: 'HTML', reply_markup: startKeyboard})
             
-            bot.sendMessage(user.userFrom, `Sizda yangi do'st bor <b>+500 so'm\n\nJami balansingiz: ${addUserPrice.userPrice * 500} so'm💰</b>`, {parse_mode: 'HTML'})
+            bot.sendMessage(user.userFrom, `Sizda yangi do'st bor <b>➕1💎Olmos</b>\n\nJami olmoslaringiz: <b>💎${addUserOlmos.userOlmos} ta</b>`, {parse_mode: 'HTML'})
         } else {
-            bot.sendMessage(userId, `Assalomu alaykum <b><a href="tg://user?id=${msg.from.id}">${msg.from.first_name}</a></b>\n\nPul ishlash uchun pastdagi tugma orqali havolangizni oling va do'stlaringizni taklif qiling! Har bir do'stingiz uchun 500 so'm miqdoridagi pul balansingizga qo'shiladi.\n\n<b>📝Shartlar</b> tugmachasini tanlash orqali to'liq tanishib chiqishingiz mumkin!`, {parse_mode: 'HTML', reply_markup: startKeyboard})
+            bot.sendMessage(userId, `Assalomu alaykum <b><a href="tg://user?id=${msg.from.id}">${msg.from.first_name}</a></b>\n\nBot o'ylagan sonni topgan har bir to'g'ri javobingiz uchun 500 so'm miqdoridagi pul balansingizga qo'shiladi.\n\n<b>📝Shartlar</b> tugmachasini tanlash orqali to'liq tanishib chiqishingiz mumkin!`, {parse_mode: 'HTML', reply_markup: startKeyboard})
         }
         
     } else {
@@ -87,7 +91,7 @@ bot.on('message', async (msg) => {
 
 
         if(msg.text === '🖇Mening havolam') {
-            bot.sendMessage(userId, `Ushbu havola orqali do'stlaringizni taklif qilib pul ishlang!\n\n${process.env.bot_name}?start=${userId}\n\nHar bir taklif qilgan do'stingiz uchun 500 so'm💷 miqdoridagi pulni qo'lga kiriting!`, {disable_web_page_preview: true, reply_markup: {
+            bot.sendMessage(userId, `Ushbu havola orqali do'stlaringizni taklif qilib, har bir do'stingiz uchun <b>1💎</b> qo'lga kiritishing!\n\n${process.env.bot_name}?start=${userId}`, {disable_web_page_preview: true,parse_mode: 'HTML', reply_markup: {
                 inline_keyboard: [
                   [
                     {
@@ -110,7 +114,37 @@ bot.on('message', async (msg) => {
                   [
                     {
                         text: 'Isbot Kanal✅',
-                        url: 'https://t.me/Pultopproisbot' // URL manzili
+                        url: 'https://t.me/+HmCIlKq_aNZmM2Uy' // URL manzili
+                    },
+                    {
+                        text: 'Son Topganlar✅',
+                        url: 'https://t.me/+u9N7uvFBZu04Zjky' // URL manzili
+                    }
+                  ],
+                ]
+        }})}
+
+
+        if(msg.text === '💎Olmos') {
+
+            let user = await User.findOne({userId})
+
+            bot.sendMessage(userId,`👤Ism: <b>${user.firstName}</b>\n\n💎Olmoslar: <b>${user.userOlmos} ta</b>\n\nDo'stlaringizni taklif qilish orqali 💎Olmoslarni ko'paytirig!`, {parse_mode: 'HTML', reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                        text: 'Isbot Kanal✅',
+                        url: 'https://t.me/+HmCIlKq_aNZmM2Uy' // URL manzili
+                    },
+                    {
+                        text: 'Son Topganlar✅',
+                        url: 'https://t.me/+u9N7uvFBZu04Zjky' // URL manzili
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Do\'stlarni taklif qilish',
+                      switch_inline_query: userId
                     }
                   ]
                 ]
@@ -126,13 +160,17 @@ bot.on('message', async (msg) => {
                   [
                     {
                       text: 'Adminga yozish✍️',
-                      url: 'https://t.me/Pultoppro' // URL manzili
-                    }
-                  ],
+                      url: 'https://t.me/BirSonOyladim_ADMIN' // URL manzili
+                    },
+                  ], 
                   [
                     {
+                        text: 'Son Topganlar✅',
+                        url: 'https://t.me/+u9N7uvFBZu04Zjky' // URL manzili
+                    },
+                    {
                         text: 'Isbot Kanal✅',
-                        url: 'https://t.me/Pultopproisbot' // URL manzili
+                        url: 'https://t.me/+HmCIlKq_aNZmM2Uy' // URL manzili
                     }
                   ]
                 ]
@@ -142,21 +180,24 @@ bot.on('message', async (msg) => {
 
         
         if(msg.text == '📝Shartlar') {
-            bot.sendMessage(userId, `<b>👉Halollik foydadan ustun</b>\nSizga berilayotgan pullar homiy kanallarimiz tomonidan moliyalashtiriladi!\n\n📝Shartlar juda oddiy, bizning homiy kanallarga a'zo bo'lgan bo'lsangiz <b>🖇Mening havolam</b> tugmasi orqali o'z havolangizni olib do'slaringizni taklif qilish orqali har bir taklif qilgan do'stingiz uchun sizga 500 so'm miqdoridagi pul qo'shiladi.Balansingiz 5600 so'm yoki undan ko'proq bo'lsihi bilan adminga murojaat qilib pulingizni yechib olishingiz mumkin!\n\n<b>❗️Eslatma</b>: Hisobingiz 5600 so'mga yetmay turib adminga yozib vaqtni olsangiz yoki aldashga urinsangiz qora ro'yhatga tushasiz va tanlovdan chetlashtirilasiz!\n\n<b>💴Pulni Yechish</b> tugmasini tanlash orqali pulingizni yechib olishingiz mumkin.`, {parse_mode: 'HTML', reply_markup: {
+            bot.sendMessage(userId, `<b>👉Halollik foydadan ustun</b>\n\nSizga berilayotgan pullar homiy kanallarimiz tomonidan moliyalashtiriladi!\n\n<b>📝Shartlar juda oddiy:</b>\n\n<b>🎲Bir Son O'yladim</b>  tugmasini bosing, bot 1 dan 10 gacha (1 va 10 ham kiradi) taqribiy bir sonni o'ylaydi, siz shu sonni topish uchun o'z o'ylagan soningizni yuborasiz.Siz topgan har bir to'g'ri javob uchun <b>xisobingizga 500 so'm</b> qo'shiladi.\n\n<b>💎Olmos</b> lar orqali siz o'yin o'ynab pul ishlaysiz.Bir urinish bu  bir olmos ➖💎 minus degani. 💎 olmos yig'ish uchun do'stlaringizni taklif qiling! Har bir do'stingiz uchun 💎 bir olmosni qo'lga kiritasiz bu degani yana bir pul ishlash uchun imkoniyat.\n\n<b>❗️Eslatma:</b> Hisobingiz 5600 so'mga yetmay turib adminga yozib vaqtni olsangiz yoki aldashga urinsangiz qora ro'yhatga tushasiz va tanlovdan chetlashtirilasiz!\n\n<b>💴Pulni Yechish</b> tugmasini tanlash orqali pulingizni yechib olishingiz mumkin.`, {parse_mode: 'HTML', reply_markup: {
                 inline_keyboard: [
                   [
                     {
                         text: 'Isbot Kanal✅',
-                        url: 'https://t.me/Pultopproisbot' // URL manzili
+                        url: 'https://t.me/+HmCIlKq_aNZmM2Uy' // URL manzili
+                    },
+                    {
+                        text: 'Son Topganlar✅',
+                        url: 'https://t.me/+u9N7uvFBZu04Zjky' // URL manzili
                     }
-                  ]
+                  ],
+                    
                 ]
               }})
         }
 
-        // else {
-        //     console.log(msg.text);
-        // }
+
 
     } else {
         if(msg.text !== '/start') {
@@ -199,6 +240,140 @@ bot.on('message', async (msg) => {
 
 
 
+///**************  Asosiy bir son o'yladim qismi  ************************/
+bot.on('message', async (msg) => {
+
+    const userId = msg.from.id
+    let user = await User.findOne({userId}).lean()
+
+
+    if(user) {
+        const subscriptionResults = await checkSubscriptions(msg)
+    const notSubscribedChannels = subscriptionResults.filter(result => !result.subscribed)
+
+    if(msg.text == "🎲Bir Son O'yladim" && notSubscribedChannels.length === 0 && user.userOlmos > 0) {
+        
+        const emojies = ["😁","🙂","😕","🫢","🫤","🤫",
+                        "🫠","🙄","😜", "🧐","🥱","🤧",
+                        "🤤","😬","🙄","👀","🙈","🙊",
+                        "🙉","🫵","🫣","🥺","😎","😊"]
+
+        let son = Math.floor(Math.random() * 10) + 1
+
+        let userUpdateSon = await User.findOne({userId})
+        userUpdateSon.userOlmos -= 1
+        userUpdateSon.son = son
+        await User.findByIdAndUpdate(userUpdateSon._id, userUpdateSon, {new: true})
+                        
+        bot.sendMessage(userId, `<b>10 dan 1 gacha bo'lgan son o'yladim, topingchi? </b>${emojies[Math.floor(Math.random() * emojies.length)]}` , {parse_mode: 'HTML', reply_markup: oylanganSon})
+
+    } 
+    else if (msg.text == "🎲Bir Son O'yladim" && user.userOlmos == 0) {
+        bot.sendMessage(userId, `Sizda 💎olmoslar mavjud emas, olmos yig'ish uchun do'stlaringizni taklif qiling`, {reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: 'Do\'stlarni taklif qilish',
+                  switch_inline_query: userId
+                }
+              ]
+            ]
+          }})
+    } 
+    
+    else if(msg.text == "🎲Bir Son O'yladim" && notSubscribedChannels.length !== 0) {
+        let channelsUrl = []
+        let channelIds = []
+        const channels = await Channels.find()
+
+        
+
+        channels.map((channel) => {
+            channelIds.push(channel.channelId)
+            channelsUrl.push(channel.channelUrl)
+        })
+        let message = 'Botdan foydalanish uchun quyidagi kanallarga obuna bo\'lib <b>/start</b> bosing!\n';
+        let inlinKeyboard = []
+        notSubscribedChannels.forEach(result => {
+            inlinKeyboard.push([
+                {
+                    text: "Obuna bo'lish",
+                    url: `${channelsUrl[channelIds.indexOf(result.channelId)]}`
+                }
+            ])
+        });
+        const options = {parse_mode: 'HTML' ,reply_markup: {inline_keyboard: inlinKeyboard}};
+        bot.sendMessage(userId, message, options);
+    }
+    }
+})
+
+
+
+bot.on('callback_query', async (callbackQuery) => {
+    let userId = callbackQuery.from.id
+
+    let user = await User.findOne({userId})
+
+    // const message = callbackQuery.message;
+    const data = callbackQuery.data;
+    const messageId = callbackQuery.message.message_id
+
+    if(user.son == +data) {
+        let userPriceUpdate = await User.findOne({userId})
+        userPriceUpdate.userPrice += 1  
+        await User.findByIdAndUpdate(userPriceUpdate._id, userPriceUpdate, {new: true})
+    }
+    // console.log(typeof data);
+    // Tanlangan tugmaga qarab javob berish
+    // bot.sendMessage(message.chat.id, `Siz ${data}-opsiyani tanladingiz.`);
+    bot.deleteMessage(userId, messageId)
+        .then(() => {
+            // Xabar o'chirilgandan keyin foydalanuvchiga javob berish
+            if(user.son == +data) {
+                bot.sendMessage(userId, `✅Siz o'ylangan sonni topdingiz <b>+500 so'm</b>\n\n💰Jami balans: <b>${(user.userPrice + 1) * 500} so'm</b>`, {parse_mode: 'HTML', reply_markup: {
+                    inline_keyboard: [
+                      [
+                        {
+                            text: 'Son Topganlar✅',
+                            url: 'https://t.me/+u9N7uvFBZu04Zjky' // URL manzili
+                        }
+                      ]
+                    ]
+                  }})
+
+                bot.sendMessage(-1002166678305, `<b>✅O'ylagan sonni topdi!\n\n</b>👤User: <b>${user.firstName} </b>\n\n💰Qo'shildi: <b>+500 so'm</b>`, {parse_mode: 'HTML', reply_markup: {
+                    inline_keyboard: [
+                      [
+                        {
+                            text: 'O\'ynash uchun✅',
+                            url: 'https://t.me/birson_bot' // URL manzili
+                        }
+                      ]
+                    ]
+                  }})
+            
+                .then(() => {})
+                .catch();
+            } else {
+                bot.sendMessage(userId, `❌Afsuski men o'ylagan sonni topolmadingiz!`)
+            }
+            // bot.sendMessage(userId, `Xabar o'chirildi. Siz ${callbackQuery.data}-opsiyani tanladingiz.`);
+        })
+        .catch((error) => {
+            console.error('Xabarni o‘chirishda xatolik yuz berdi:', error);
+        });
+
+    
+    let userSonUpdate = await User.findOne({userId})
+    userSonUpdate.son = 0 
+    await User.findByIdAndUpdate(userSonUpdate._id, userSonUpdate, {new: true})
+})
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -214,7 +389,7 @@ bot.on('inline_query', (inlineQuery) => {
         id: '1', // Unikal identifikator
         title: 'Do\'stlarga ulashish uchun bosing:✅',
         input_message_content: {
-          message_text: `👋Pul ishlashni hoxlaysizmi?!\n\n🤖Sizni pul to'laydigan botga taklif qilaman!\n\n${process.env.bot_name}?start=${inlineQuery.from.id}` // Foydalanuvchi yuborgan matn
+          message_text: `👋Pul ishlashni hoxlaysizmi?!\n\n🤖Sizni o'yin o'ynab pul ishlaydigan botga taklif qilaman!\n\n${process.env.bot_name}?start=${inlineQuery.from.id}` // Foydalanuvchi yuborgan matn
         }
       }
     ];
@@ -231,7 +406,7 @@ bot.onText(/\/pay (.+)/, async (msg, match) => {
     let user = await User.findOne({ userId: resp })
 
     
-    if(userId === 1477817763) {
+    if(userId === 1477817763 || userId === 6836007869) {
         bot.sendMessage(-1002186291781, `👤User: <b>${user.firstName}</b>\n💰Summa: <b>${user.userPrice * 500} so'm\n\n✅To'lab berildi</b>`, {parse_mode: 'HTML'})
         .then(() => {})
         .catch();
@@ -256,7 +431,7 @@ bot.onText(/\/add_channel (.+)/, async (msg, match) => {
         channelUrl: resp.split(' ')[2]
     });
 
-    if(userId == 1477817763) {  
+    if(userId === 1477817763 || userId === 6836007869) {  
         try {
             await newChannel.save();
             await bot.sendMessage(userId, "Muvaffqiyatli saqlandi");
@@ -274,7 +449,7 @@ bot.onText(/\/del_channel (.+)/, async (msg, match) => {
     const userId = msg.from.id
     const resp = match[1];
 
-    if(userId == 1477817763) {
+    if(userId === 1477817763 || userId === 6836007869) {
         const deleteChannel = await Channels.findOneAndDelete({channelId: resp})
         if(deleteChannel) {
             bot.sendMessage(userId, "Muvaffaqiyatli o'chirilid")
@@ -295,7 +470,7 @@ bot.onText(/\/send_reklama (.+)/, async (msg, match) => {
     const message = match[1];
     let countSend = 0
 
-    if(userId === 1477817763) {
+    if(userId === 1477817763 || userId === 6836007869) {
         async function sendMessageWithDelay(userId, message, delay) {
             return new Promise(resolve => {
               setTimeout(async () => {
@@ -321,4 +496,18 @@ bot.onText(/\/send_reklama (.+)/, async (msg, match) => {
         }
         sendMessageToAllUsers(message);
     }
+})
+
+bot.onText(/\/update$/, async (msg) => {
+    if(msg.from.id == 1477817763) {
+        let users = await User.find({})
+        try {
+            for (let i = 0; i < users.length; i++) {
+                let user = await User.findOne({userId: users[i].userId})
+                user.userOlmos += 2
+                await User.findByIdAndUpdate(user._id, user, {new: true})
+            }
+        } catch (error) {}
+        // console.log(users.length);
+    } 
 })
